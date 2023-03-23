@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+        "target": "ES2020",
+        "module": "ES2022",
+        "rootDir": "site-utils/src",
+        "moduleResolution": "node",
+        "declaration": false,
+        "outDir": "site-utils/dist",
+        "noEmitOnError": true,
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "allowSyntheticDefaultImports": true,
+        "strict": true,
+        "skipLibCheck": true,
+    },
+    "include": [
+		"site-utils/src"
+	],
+    "exclude": [
+        "**/__tests__/*"
+    ]
+}
