@@ -16,7 +16,7 @@
             "never"
         ],
         "no-constant-condition": "off",
-        // "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/no-explicit-any": "condition",
         "@typescript-eslint/member-delimiter-style": [
             "error",
             {

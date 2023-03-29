@@ -1,4 +1,5 @@
-src/*.ts
+src
 tsconfig.json
 *.tgz
 .eslintrc.json
+jest.config.json
