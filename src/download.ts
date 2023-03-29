@@ -78,7 +78,7 @@ export class Download {
    * @param fileName - (Optional) The name to use for the downloaded images.
    */
     async getAllImages(elements: HTMLElement[], path: string, fileName?: string) {
-        const imageGetter = new GetImages({ log: true , duplicate: true})
+        const imageGetter = new GetImages()
         if (fileName === undefined) {
             const descriptors = await imageGetter.getImage(elements, fileName)
             await this.fileFromdescriptor(descriptors, path)
