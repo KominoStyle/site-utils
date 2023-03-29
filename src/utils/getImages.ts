@@ -1,3 +1,6 @@
+/**
+ * Provides methods for getting Images from URLs and HTML elements.
+ */
 export class GetImages {
     #logConfig: LoggerConfigAddDuplicated = {}
 

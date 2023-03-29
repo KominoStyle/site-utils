@@ -4,11 +4,18 @@ import jquery from "jquery"
 import { Download } from "./download.js"
 import { isHTMLElement } from "./utils/checkFunctions.js"
 
+/**
+ * The `Site` class provides utility methods for interacting with websites.
+ */
 export default class Site {
+    /**
+     * Provides a static instance of the Download class to easily download files.
+     * @remarks The downloader instance can be accessed directly to download files without creating a new instance of the Download class.
+     */
     private static downloader = new Download()
 
     //#region Site
-    /**
+    /** 
      * Gets the window object of a given domain URL.
      * @param domainURL - The URL of the domain to get the window object for.
      * @returns The window object of the given domain URL.

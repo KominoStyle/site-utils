@@ -4,6 +4,9 @@ import fs from "fs/promises"
 import { dirname } from "path"
 import { GetImages } from "./utils/getImages.js"
 
+/**
+ * Provides methods for downloading files from URLs and HTML elements.
+ */
 export class Download {
     #logConfig: LoggerConfig = {}
 
