@@ -77,7 +77,7 @@ export class GetImages {
             }
 
             if (imgDescriptors.find(
-                (v) => v.name === name)) {
+                (value) => value.name === name)) {
                 if (this.#logConfig.duplicate) logCounter++, console.warn(logCounter, `Skipping: "${name}". Already found`)
                 return
             }
