@@ -26,14 +26,13 @@ export class MeasureTime {
 
     // Returns current time
     private now() {
-        return new Date().getTime()
+        return Date.now()
     }
 
     // Returns time elapsed since `beginning`
     // (and, optionally, prints the duration in seconds)
     private elapsed(beginning: number, expect?: ExpectOptions, log?: boolean) {
-
-        const duration = this.now() - beginning /* + 666666600000 */ //? this is for testing
+        const duration = this.now() - beginning //? this is for testing
         const formattedTime = this.formatTime(duration, expect)
 
         if (log) console.log(`${formattedTime}`)
@@ -46,6 +45,9 @@ export class MeasureTime {
         expect: ExpectOptions = {}
 		) {
 
+        if (duration < 0) throw new Error()
+        
+        if (expect.year && expect.week || expect.month && expect.week) throw new Error("Fuck You")
         const milliseconds = duration % 1000
         const seconds = Math.floor((duration / 1000) % 60)
         const minutes = Math.floor((duration / 1000 / 60) % 60)
@@ -88,9 +90,8 @@ export class MeasureTime {
             { value: milliseconds, symbol: "ms", expected: true, notAllowed: [] }
         ].filter(unit => unit.value > 0 && unit.expected && !unit.notAllowed.some(item => expect[item as keyof ExpectOptions]))
 
-
         if (units.some(unit => unit.symbol === "h" || unit.symbol === "d" || unit.symbol === "y" || unit.symbol === "m" || unit.symbol === "w")) {
-            units.splice(units.findIndex(unit => unit.symbol === "ms"), 1)
+            if (units.some(unit => unit.symbol === "ms")) units.splice(units.findIndex(unit => unit.symbol === "ms"), 1)
         }
 
         return units.map((unit) => {

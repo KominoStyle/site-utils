@@ -4,3 +4,4 @@ lib/
 *.tgz
 package-lock.json
 my index/
+coverage/

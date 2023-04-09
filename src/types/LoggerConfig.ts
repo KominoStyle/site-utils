@@ -14,6 +14,10 @@ interface LoggerConfig {
      * Whether to log messages at the 'warn' level.
      */
     warn?: boolean
+    /**
+     * Whether to log messages at the 'error' level.
+     */
+    error?: boolean
 }
 
 /**

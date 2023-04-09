@@ -1,5 +1,7 @@
 src
+coverage/
 tsconfig.json
 *.tgz
 .eslintrc.json
 jest.config.json
+.vsls.json

@@ -1,13 +1,15 @@
+type GetImageSourceFunc = (img: HTMLImageElement) => string
+
 /**
  * Provides methods for getting Images from URLs and HTML elements.
  */
 export class GetImages {
     #logConfig: LoggerConfigAddDuplicated = {}
 
-     /**
-     * Constructor of GetImages class.
-     * @param loggerConfig - (Optional) The configuration for logging.
-     */
+    /**
+    * Constructor of GetImages class.
+    * @param loggerConfig - (Optional) The configuration for logging.
+    */
     constructor(loggerConfig?: LoggerConfigAddDuplicated) {
         if (loggerConfig) this.#logConfig = loggerConfig
     }
@@ -19,8 +21,27 @@ export class GetImages {
      */
     private findAllImages(elements: HTMLElement[]): HTMLImageElement[] {
         const images: HTMLImageElement[] = []
+
+        // function getAllAttributes(element: HTMLElement): Record<string, string> {
+        //     const attributes = element.attributes
+        //     const result: Record<string, string> = {}
+
+        //     for (let i = 0;i < attributes.length;i++) {
+        //         const attribute = attributes.item(i)
+        //         if (attribute) {
+        //             result[attribute.name] = attribute.value
+        //         }
+        //     }
+
+        //     return result
+        // }
+
         elements.forEach(container => {
             images.push(...container.querySelectorAll("img"))
+            // images.forEach(image => {
+            //     const allAttributes = getAllAttributes(image)
+            //     console.log(allAttributes)
+            // })
         })
 
         return images
@@ -32,7 +53,7 @@ export class GetImages {
      * @param fileName Optional. If provided, only returns the unique image source URLs. Otherwise, returns the image descriptors.
      * @returns An array of ImageDescriptor objects if fileName is not provided, otherwise returns a set of unique image source URLs.
      */
-    async getImage(content: HTMLElement[], fileName: undefined): Promise<ImageDescriptor[]>
+    async getImage(content: HTMLElement[], fileName?: undefined): Promise<ImageDescriptor[]>
     async getImage(content: HTMLElement[], fileName: string): Promise<Set<string>>
     async getImage(content: HTMLElement[], fileName?: string) {
         if (fileName === undefined) {
@@ -56,11 +77,26 @@ export class GetImages {
         let logCounter = 0
         let namePlaceholderCounter = 1
         const imgDescriptors: ImageDescriptor[] = []
+
         imges.forEach((element) => {
             let name: string
-            const getSrc = element.getAttribute('data-src') || element.getAttribute('src')
+            const lazyloading = element.getAttribute('loading')
+            const getSrc = element.getAttribute('src')
+            const getDataSrc = element.getAttribute('data-src')
+            let hasSrc = getDataSrc || getSrc
+            
+            if (hasSrc === null) throw new Error(`Skipping: 'src' attribute value. Failed to find`)
+            
+            if (lazyloading && getDataSrc) {
+                hasSrc = getDataSrc 
+            }
 
-            if (getSrc === null) throw new Error(`Skipping: 'src' attribute value. Failed to find`)
+            try {
+                new URL(hasSrc)
+            } catch (error) {
+                if (this.#logConfig.error) console.error(`Invalid URL found: ${hasSrc}`)
+                return
+            }
 
             const attrData_Key = element.getAttribute('data-image-key')
             const attrData_Name = element.getAttribute('data-image-name')?.replace(" ", "_")
@@ -68,13 +104,11 @@ export class GetImages {
             const checkThisAttr = attrData_Key ?? attrData_Name ?? attrAlt
 
             if (checkThisAttr === undefined) {
-                if (this.#logConfig.info) console.info(`No possible filename found. New Name: Placeholder${namePlaceholderCounter++}`)
-                name = `Placeholder${namePlaceholderCounter}`
+                if (this.#logConfig.info) console.info(`No possible filename found. New Name: Placeholder${namePlaceholderCounter}`)
+                name = `Placeholder${namePlaceholderCounter++}`
             } else {
-                let matches = checkThisAttr.match(/^[^\.]*/gm)
-                if (matches === null || matches[0] === "") matches = [`${Math.random()}`.replace(".", "")]
-                name = matches[0]
-            }
+                name = checkThisAttr
+            }        
 
             if (imgDescriptors.find(
                 (value) => value.name === name)) {
@@ -82,13 +116,12 @@ export class GetImages {
                 return
             }
 
-            imgDescriptors.push({src: getSrc, name})
+            imgDescriptors.push({ src: hasSrc, name })
             logCounter++
             if (this.#logConfig.log) console.log(logCounter, name)
         })
 
         return imgDescriptors
-
     }
 
     /**
@@ -97,23 +130,38 @@ export class GetImages {
      * @returns A `Set` of unique image source URLs.
      * @throws An error if the `src` attribute value is not found.
      */
-    private async getImageSrces(content: HTMLElement[]) {
+    private async getImageSrces(content: HTMLElement[], getSrcFunc ?: GetImageSourceFunc) {
         const imges = this.findAllImages(content)
         let logCounter = 0
         const imgSet = new Set<string>()
 
         imges.forEach((element) => {
-            const getSrc = element.getAttribute('data-src') || element.getAttribute('src')
+            const lazyloading = element.getAttribute('loading')
+            const getSrc = element.getAttribute('src')
+            const getDataSrc = element.getAttribute('data-src')
+            let hasSrc = getDataSrc || getSrc
+            
+            if (hasSrc === null) throw new Error(`Skipping: 'src' attribute value. Failed to find`)
 
-            if (getSrc === null) throw new Error(`Skipping: 'src' attribute value. Failed to find`)
-            if (imgSet.has(getSrc)) {
+            if (lazyloading && getDataSrc) {
+                hasSrc = getDataSrc 
+            }
+
+            try {
+                new URL(hasSrc)
+            } catch (error) {
+                 if (this.#logConfig.error) console.error(`Invalid URL found: ${hasSrc}`)
+                 return
+            }
+
+            if (imgSet.has(hasSrc)) {
                 if (this.#logConfig.duplicate) logCounter++, console.warn(logCounter, `Skipping: 'src' attribute value. Already found`)
                 return
             }
 
-            imgSet.add(getSrc)
+            imgSet.add(hasSrc)
             logCounter++
-            if (this.#logConfig.log) console.log(logCounter, `${getSrc}`)
+            if (this.#logConfig.log) console.log(logCounter, `${hasSrc}`)
         })
 
         return imgSet

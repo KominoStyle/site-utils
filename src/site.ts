@@ -1,4 +1,4 @@
-import fetch from "node-fetch"
+import axios from "axios"
 import { JSDOM } from "jsdom"
 import jquery from "jquery"
 import { Download } from "./download.js"
@@ -7,7 +7,7 @@ import { isHTMLElement } from "./utils/checkFunctions.js"
 /**
  * The `Site` class provides utility methods for interacting with websites.
  */
-export default class Site {
+export class Site {
     /**
      * Provides a static instance of the Download class to easily download files.
      * @remarks The downloader instance can be accessed directly to download files without creating a new instance of the Download class.
@@ -21,7 +21,7 @@ export default class Site {
      * @returns The window object of the given domain URL.
      */
     static async getWindow(domainURL: string) {
-        return new JSDOM(await (await fetch(domainURL)).text()).window
+        return new JSDOM((await axios<string>(domainURL)).data).window
     }
 
     /**

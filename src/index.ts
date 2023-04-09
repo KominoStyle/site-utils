@@ -1,3 +1,1 @@
-import Site from "./site.js"
-
-export default Site
+export { Site } from "./site"
